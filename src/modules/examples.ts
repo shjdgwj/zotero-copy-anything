@@ -154,20 +154,19 @@ export class UIExampleFactory {
     doc.getElementById("zotero-item-pane-content")?.classList.add("makeItRed");
   }
 
+  /** 注册阅读器与标签页菜单；输入无，输出事件注册。例如启动时调用此方法。 */
   static registerRightClickReadViewer() {
     Zotero.Reader.registerEventListener(
       "createViewContextMenu",
       (event: any) => {
         console.log(event);
-        const { append } = event;
+        const { append, reader } = event;
 
         append({
           label: getString("zotero-copy-anything-read-viewer-label"),
-          // label: "helo",
           onCommand: async () => {
-            const Zotero_Tabs = ztoolkit.getGlobal("Zotero_Tabs");
-            const item = Zotero.Reader.getByTabID(Zotero_Tabs.selectedID)._item;
-            await copyItems([item]);
+            // 使用触发菜单的阅读器，独立窗口和后台标签不依赖主窗口选择。
+            await copyItems([Zotero.Items.get(reader.itemID)]);
           },
         });
       },
